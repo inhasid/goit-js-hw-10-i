@@ -17,12 +17,11 @@ const refs = {
 const arrBreedsId = [];
 
 const { breedSelect, catInfo, loader, error } = refs;
-
 breedSelect.addEventListener('change', changeCatBreed);
 
 fetchBreeds()
   .then(data => {
-    data.forEach(element => {
+    data.map(element => {
       arrBreedsId.push({ text: element.name, value: element.id });
     });
     new SlimSelect({
@@ -31,7 +30,7 @@ fetchBreeds()
       data: arrBreedsId,
     });
   })
-  .catch((err) => {
+    .catch((err) => {
         Notiflix.Notify.failure(
           `Oops! Something went wrong! Try reloading the page!`
         );
@@ -39,34 +38,45 @@ fetchBreeds()
 
 function changeCatBreed(event) {
 
-  event.preventDefault();
+//  event.preventDefault();
   loader.classList.remove('is-hidden');
-  const breedId = event.currentTarget;
-  fetchCatByBreed(breedId)
-    .then(data => { catInfo.innerHTML = createMarkup(data.breedId); })
-    .catch((err) => {
+  const breedId = event.target.value;
+    fetchCatByBreed(breedId)
+        .then(data => {
+            const { url, breeds } = data[0];
+            loader.classList.add('is-hidden');
+            catInfo.innerHTML = `<div class="cat-img">
+                  <img src="${url}" alt="${breeds[0].name}" width="400"/>
+              </div>
+              <div class="cat-description">
+                  <h1>${breeds[0].name}</h1>
+                  <p class="cat-text">${breeds[0].description}</p>
+                  <p class="cat-text"><b>Temperament:</b> ${breeds[0].temperament}</p>
+              </div>`;
+        })
+        .catch((err) => {
       Notiflix.Notify.failure(
         `Oops! Something went wrong! Try reloading the page!`
       );
     });
 }
 
-function createMarkup(arr) {
-  //const { url, breeds } = data[0];
-  return arr.map(
-    ({ url, breeds: {
-      name,
-      description,
-      temperament,
-    }, }) => `<div class="cat-img">
-                  <img src="${url}" alt="${name}" width="400"/>
-              </div>
-              <div class="cat-description">
-                  <h1>${name}</h1>
-                  <p>${description}</p>
-                  <p><b>Temperament:</b>${temperament}</p>
-              </div>`
-  ).join("");
-}
+// function createMarkup(arr) {
+//   //const { url, breeds } = data[0];
+//   return arr.map(
+//     ({ url, breeds: {
+//       name,
+//       description,
+//       temperament,
+//     }, }) => `<div class="cat-img">
+//                   <img src="${url}" alt="${name}" width="400"/>
+//               </div>
+//               <div class="cat-description">
+//                   <h1>${name}</h1>
+//                   <p>${description}</p>
+//                   <p><b>Temperament:</b>${temperament}</p>
+//               </div>`
+//   ).join("");
+// }
 
 
